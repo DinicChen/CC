@@ -33,7 +33,7 @@ public class Input {
             case "%":
             case "Mod": return "%";
             case "|":
-            case "Or": return "‖";
+            case "Or": return "|";
             case "^":
             case "Xor": return "^";
             case "&":

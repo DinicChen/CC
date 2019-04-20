@@ -200,6 +200,8 @@ public class Calculator extends Application {
                 if(buttonContent.equals("=") ||
                         buttonContent.equals("⌫") ||
                         buttonContent.equals("Not") ||
+                        buttonContent.equals("CE") ||
+                        buttonContent.equals("C") ||
                         Character.isDigit(buttonContent.charAt(0)))
                     button.armedProperty().addListener(ov -> refresh(true));
                 else 
