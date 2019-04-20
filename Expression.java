@@ -34,6 +34,24 @@ abstract class Expression implements Iterable<ExpressionElement> {
             case ExpressionElement.DIVIDE:
                 expression.add(ExpressionOperator.OP_DIVIDE);
                 break;
+            case ExpressionElement.MOD:
+                expression.add(ExpressionOperator.OP_MOD);
+                break;
+            case ExpressionElement.OR:
+                expression.add(ExpressionOperator.OP_OR);
+                break;
+            case ExpressionElement.XOR:
+                expression.add(ExpressionOperator.OP_XOR);
+                break;
+            case ExpressionElement.AND:
+                expression.add(ExpressionOperator.OP_AND);
+                break;
+            case ExpressionElement.LEFT_SHIFT:
+                expression.add(ExpressionOperator.OP_LEFT_SHIFT);
+                break;
+            case ExpressionElement.RIGHT_SHIFT:
+                expression.add(ExpressionOperator.OP_RIGHT_SHIFT);
+                break;
             default:
                 try {
                     ExpressionOperand operand = new ExpressionOperand(content);

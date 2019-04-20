@@ -18,7 +18,9 @@ class InfixExpression extends Expression {
                 }
             }
             else if(e instanceof ExpressionOperator) {
-                while(!sop.isEmpty() && sop.peek() instanceof ExpressionOperator && 0 >= ((ExpressionOperator)e).compareTo((ExpressionOperator)sop.peek()))
+                while(!sop.isEmpty() &&
+                        sop.peek() instanceof ExpressionOperator &&
+                        0 >= ((ExpressionOperator)e).compareTo((ExpressionOperator)sop.peek()))
                     suffix.append(sop.pop());
 
                 sop.push(e);

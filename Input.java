@@ -38,6 +38,8 @@ public class Input {
             case "Xor": return "^";
             case "&":
             case "And": return "&";
+            case "Lsh": return "<<";
+            case "Rsh": return ">>";
             case "(": return "(";
             case ")": return ")";
             default: throw new IllegalArgumentException();
@@ -45,14 +47,13 @@ public class Input {
     }
     
     public void appendOperator(String content) {
+        if(operand.length() == 0)
+            return;
+
         try {
             String operator = getOperator(content);
-
-            if(operand.length() != 0) {
-                expression.append(operand.toString());
-                operand = new StringBuilder();
-            }
-
+            expression.append(operand.toString());
+            operand = new StringBuilder();
             expression.append(operator);
         }
         catch(IllegalArgumentException e) {
@@ -65,7 +66,8 @@ public class Input {
     }
 
     public void clear() {
-        expression = new InfixExpression();
+        expression.clear();
+        operand = new StringBuilder();
     }
 
     public void clearEntry() {
@@ -80,6 +82,22 @@ public class Input {
             operand.insert(0, '-');
         else
             operand.deleteCharAt(0);
+    }
+
+    public void not() {
+        if(operand.length() == 0) 
+            return;
+        
+        int op;
+        try {
+            op = Integer.parseInt(operand.toString());
+        }
+        catch(NumberFormatException e) {
+            op = 0;
+        }
+
+        op = ~op;
+        operand = new StringBuilder(op + "");
     }
 
     public String getExpression() {

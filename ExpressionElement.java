@@ -17,14 +17,26 @@ abstract class ExpressionElement {
     public static final String MINUS = "-";
     public static final String MULTIPLE = "×";
     public static final String DIVIDE = "÷";
+    public static final String MOD = "%";
+    public static final String OR = "|";
+    public static final String XOR = "^";
+    public static final String AND = "&";
+    public static final String LEFT_SHIFT = "<<";
+    public static final String RIGHT_SHIFT = ">>";
 
     protected static final Map<String, Integer> operatorPriority = new HashMap<>();
 
     static {
-        operatorPriority.put(PLUS, 1);
-        operatorPriority.put(MINUS, 1);
-        operatorPriority.put(MULTIPLE, 2);
-        operatorPriority.put(DIVIDE, 2);
+        operatorPriority.put(OR, 1);
+        operatorPriority.put(XOR, 2);
+        operatorPriority.put(AND, 3);
+        operatorPriority.put(LEFT_SHIFT, 4);
+        operatorPriority.put(RIGHT_SHIFT, 4);
+        operatorPriority.put(PLUS, 5);
+        operatorPriority.put(MINUS, 5);
+        operatorPriority.put(MULTIPLE, 6);
+        operatorPriority.put(DIVIDE, 6);
+        operatorPriority.put(MOD, 6);
     }
 
     protected static boolean isLegalOperator(String content) {

@@ -45,9 +45,15 @@ public class Calculator extends Application {
     };
     private Button[][] buttons = new Button[buttonContents.length][buttonContents[0].length];
 
-    private void refresh() {
+    private void refresh(boolean scale) {
         String expression = input.getExpression();
+        displayExpression.setText(expression);
+        
+        if(!scale)
+            return;
+
         int currentNumber = input.getOperand();
+        displayCurrentNumber.setText(currentNumber + "");
 
         String hex = Integer.toHexString(currentNumber);
         String dec = Integer.toString(currentNumber);
@@ -58,8 +64,6 @@ public class Calculator extends Application {
         displayDec.setText(dec);
         displayOct.setText(oct);
         displayBin.setText(bin);
-        displayCurrentNumber.setText(currentNumber + "");
-        displayExpression.setText(expression);
     }
 
     private EventHandler<ActionEvent> getButtonHandler(String content) {
@@ -86,12 +90,17 @@ public class Calculator extends Application {
             case "Or":
             case "Xor":
             case "And":
+            case "Lsh":
+            case "Rsh":
             case "(":
             case ")":
                 handler = (ActionEvent e) -> input.appendOperator(content);;
                 break;
             case "⌫":
                 handler = (ActionEvent e) -> input.backspace();;
+                break;
+            case "Not":
+                handler = (ActionEvent e) -> input.not();;
                 break;
             case "C":
                 handler = (ActionEvent e) -> input.clear();;
@@ -187,7 +196,15 @@ public class Calculator extends Application {
                 button.setId(buttonContent);
                 button.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
                 button.setOnAction(getButtonHandler(buttonContent));
-                button.armedProperty().addListener(ov -> refresh());
+
+                if(buttonContent.equals("=") ||
+                        buttonContent.equals("⌫") ||
+                        buttonContent.equals("Not") ||
+                        Character.isDigit(buttonContent.charAt(0)))
+                    button.armedProperty().addListener(ov -> refresh(true));
+                else 
+                    button.armedProperty().addListener(ov -> refresh(false));
+
                 button.setOnMouseEntered(e -> {button.getStyleClass().add("enter-button");});
                 button.setOnMouseExited(e -> {button.getStyleClass().remove("enter-button");});
                 buttons[i][j] = button;
@@ -258,7 +275,7 @@ public class Calculator extends Application {
                 case "8":
                 case "9":
                     input.setOperand(e.getCharacter());
-                    refresh();
+                    refresh(true);
                     break;
                 case "+":
                 case "-":
@@ -271,11 +288,11 @@ public class Calculator extends Application {
                 case "(":
                 case ")":
                     input.appendOperator(e.getCharacter());
-                    refresh();
+                    refresh(false);
                     break;
                 case "=":
                     input.getResult();
-                    refresh();
+                    refresh(true);
                     break;
             }
         });
@@ -284,11 +301,11 @@ public class Calculator extends Application {
             switch(e.getCode()) {
                 case BACK_SPACE:
                     input.backspace();
-                    refresh();
+                    refresh(true);
                     break;
                 case ENTER:
                     input.getResult();
-                    refresh();
+                    refresh(true);
                     break;
             }
         });
