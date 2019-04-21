@@ -3,7 +3,16 @@ import java.util.Iterator;
 import java.util.List;
 
 abstract class Expression implements Iterable<ExpressionElement> {
+    private int radix = 10;
     protected final List<ExpressionElement> expression = new ArrayList<>();
+
+    public int getRadix() {
+        return radix;
+    }
+
+    public void setRadix(int radix) {
+        this.radix = radix;
+    }
 
     public boolean append(ExpressionElement e) {
         if(e == null) 
@@ -76,7 +85,10 @@ abstract class Expression implements Iterable<ExpressionElement> {
             else
                 firstAdd = false;
 
-            sb.append(e.toString());
+            if(radix != 10 && e instanceof ExpressionOperand)
+                sb.append(Integer.toString(((ExpressionOperand)e).getValue(), radix).toUpperCase());
+            else
+                sb.append(e.toString());
         }
 
         return sb.toString();

@@ -28,6 +28,7 @@ class ExpressionOperand extends ExpressionElement implements Comparable<Expressi
 
     @Override
     public String toString() {
-        return Integer.toString(value);
+        //return Integer.toString(value);
+        return content;
     }
 }

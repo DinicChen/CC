@@ -1,23 +1,34 @@
 import java.util.ArrayList;
 
 public class Input {
-    private StringBuilder operand;
-    private InfixExpression expression;
+    private int radix = 10;
+    private StringBuilder operand = new StringBuilder();
+    private InfixExpression expression = new InfixExpression();
 
-    public Input() {
-        operand = new StringBuilder();
-        expression = new InfixExpression();
+    public void setRadix(int radix) {
+        int currentOperand = getOperand();
+
+        if(currentOperand != 0)
+            operand = new StringBuilder(Integer.toString(currentOperand, radix));
+
+        this.radix = radix;
+        expression.setRadix(radix);
     }
 
     public void setOperand(String content) {
         operand.append(content);
+        System.out.println(operand);
     }
 
     public int getOperand() {
+        if(operand.length() == 0)
+            return 0;
+
         try {
-            return Integer.parseInt(operand.toString());
+            return Integer.parseInt(operand.toString(), radix);
         }
         catch(NumberFormatException e) {
+            System.out.println("===" + e);
             return 0;
         }
     }
@@ -47,13 +58,14 @@ public class Input {
     }
     
     public void appendOperator(String content) {
-        if(operand.length() == 0)
-            return;
-
         try {
             String operator = getOperator(content);
-            expression.append(operand.toString());
-            operand = new StringBuilder();
+            
+            if(operand.length() != 0) {
+                expression.append(Integer.toString(getOperand()));
+                operand = new StringBuilder();
+            }
+
             expression.append(operator);
         }
         catch(IllegalArgumentException e) {
@@ -88,16 +100,16 @@ public class Input {
         if(operand.length() == 0) 
             return;
         
-        int op;
+        int currentOperand;
         try {
-            op = Integer.parseInt(operand.toString());
+            currentOperand = Integer.parseInt(operand.toString(), radix);
         }
         catch(NumberFormatException e) {
-            op = 0;
+            currentOperand = 0;
         }
 
-        op = ~op;
-        operand = new StringBuilder(op + "");
+        currentOperand = ~currentOperand;
+        operand = new StringBuilder(Integer.toString(currentOperand, radix));
     }
 
     public String getExpression() {
@@ -106,7 +118,7 @@ public class Input {
 
     public void getResult() {
         if(operand.length() != 0)
-            expression.append(operand.toString());
+            expression.append(Integer.toString(getOperand()));
 
         int result;
         try {
@@ -116,7 +128,7 @@ public class Input {
             result = 0;
         }
 
-        operand = new StringBuilder(result + "");
+        operand = new StringBuilder(Integer.toString(result, radix));
         expression.clear();
     }
 }

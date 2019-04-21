@@ -4,6 +4,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
@@ -15,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Calculator extends Application {
+    private int radix = 10;
     private Input input = new Input();    
 
     private Scene scene;
@@ -37,7 +39,7 @@ public class Calculator extends Application {
     private String[][] buttonContents = {
         {"⍌", "⍞", "WORD", "", "MS", "M"},
         {"Lsh", "Rsh", "Or", "Xor", "Not", "And"},
-        {"↑", "Mod", "CE", "C", "⌫", "÷"},
+        {"↑", "Mod", "CE", "Ċ", "⌫", "÷"},
         {"A", "B", "7", "8", "9", "×"},     
         {"C", "D", "4", "5", "6", "-"},
         {"E", "F", "1", "2", "3", "+"}, 
@@ -53,9 +55,7 @@ public class Calculator extends Application {
             return;
 
         int currentNumber = input.getOperand();
-        displayCurrentNumber.setText(currentNumber + "");
-
-        String hex = Integer.toHexString(currentNumber);
+        String hex = Integer.toHexString(currentNumber).toUpperCase();
         String dec = Integer.toString(currentNumber);
         String oct = Integer.toOctalString(currentNumber);
         String bin = Integer.toBinaryString(currentNumber);
@@ -64,6 +64,21 @@ public class Calculator extends Application {
         displayDec.setText(dec);
         displayOct.setText(oct);
         displayBin.setText(bin);
+        
+        switch(radix) {
+            case 2:
+                displayCurrentNumber.setText(bin);
+                break;
+            case 8:
+                displayCurrentNumber.setText(oct);
+                break;
+            case 10:
+                displayCurrentNumber.setText(dec);
+                break;
+            case 16:
+                displayCurrentNumber.setText(hex);
+                break;
+        }
     }
 
     private EventHandler<ActionEvent> getButtonHandler(String content) {
@@ -80,6 +95,12 @@ public class Calculator extends Application {
             case "7":
             case "8":
             case "9":
+            case "A":
+            case "B":
+            case "C":
+            case "D":
+            case "E":
+            case "F":
                 handler = (ActionEvent e) -> {input.setOperand(content);};
                 break;
             case "+":
@@ -102,7 +123,7 @@ public class Calculator extends Application {
             case "Not":
                 handler = (ActionEvent e) -> input.not();;
                 break;
-            case "C":
+            case "Ċ":
                 handler = (ActionEvent e) -> input.clear();;
                 break;
             case "CE":
@@ -115,11 +136,81 @@ public class Calculator extends Application {
                 handler = (ActionEvent e) -> input.getResult();
                 break;
             default:
-                handler = (ActionEvent e) -> { };
+                handler = (ActionEvent e) -> {};
                 break;
         }
 
         return handler;
+    }
+
+    private void switchRadix(int radix) {
+        if(this.radix == 2)
+            bin.getStyleClass().remove("current-radix");
+        else if(this.radix == 8)
+            oct.getStyleClass().remove("current-radix");
+        else if(this.radix == 10)
+            dec.getStyleClass().remove("current-radix");
+        else if(this.radix == 16)
+            hex.getStyleClass().remove("current-radix");
+
+        for(int i = 0; i <= 9 ; i++) {
+            Button numeral = (Button)(keypad.lookup("#" + i));
+            numeral.setDisable(true);
+            numeral.setStyle("-fx-text-fill: #AAAAAA");
+        }
+
+        for(int i = 'A'; i <= 'F'; i++) {
+            Button numeral = (Button)(keypad.lookup("#" + (char)i));
+            numeral.setDisable(true);
+            numeral.setStyle("-fx-text-fill: #AAAAAA");
+        }
+        
+        this.radix = radix;
+
+        if(this.radix == 2) {
+            bin.getStyleClass().add("current-radix");
+            Button numeral = (Button)(keypad.lookup("#0"));
+            numeral.setDisable(false);
+            numeral.setStyle("-fx-text-fill: black");
+            numeral = (Button)(keypad.lookup("#1"));
+            numeral.setDisable(false);
+            numeral.setStyle("-fx-text-fill: black");
+        }
+        else if(this.radix == 8) {
+            oct.getStyleClass().add("current-radix");
+            for(int i = 0; i <= 7; i++) {
+                Button numeral = (Button)(keypad.lookup("#" + i));
+                numeral.setDisable(false);
+                numeral.setStyle("-fx-text-fill: black");
+            }
+        }
+        else if(this.radix == 10) {
+            dec.getStyleClass().add("current-radix");
+
+            for(int i = 0; i <= 9 ; i++) {
+                Button numeral = (Button)(keypad.lookup("#" + i));
+                numeral.setDisable(false);
+                numeral.setStyle("-fx-text-fill: black");
+            }
+        }
+        else if(this.radix == 16) {
+            hex.getStyleClass().add("current-radix");
+
+            for(int i = 0; i <= 9 ; i++) {
+                Button numeral = (Button)(keypad.lookup("#" + i));
+                numeral.setDisable(false);
+                numeral.setStyle("-fx-text-fill: black");
+            }
+
+            for(int i = 'A'; i <= 'F'; i++) {
+                Button numeral = (Button)(keypad.lookup("#" + (char)i));
+                numeral.setDisable(false);
+                numeral.setStyle("-fx-text-fill: black");
+            }
+        }
+
+        input.setRadix(radix);
+        refresh(true);
     }
 
     @Override
@@ -132,18 +223,25 @@ public class Calculator extends Application {
         displayExpression.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         displayCurrentNumber.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        hex.getStyleClass().add("scale");
-        dec.getStyleClass().add("scale");
-        oct.getStyleClass().add("scale");
-        bin.getStyleClass().add("scale");
+        hex.getStyleClass().add("radix");
+        dec.getStyleClass().add("radix");
+        dec.getStyleClass().add("current-radix");
+        oct.getStyleClass().add("radix");
+        bin.getStyleClass().add("radix");
         hex.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         dec.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         oct.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         bin.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        displayHex.getStyleClass().add("display-scale");
-        displayDec.getStyleClass().add("display-scale");
-        displayOct.getStyleClass().add("display-scale");
-        displayBin.getStyleClass().add("display-scale");
+
+        hex.setOnMouseReleased(e -> switchRadix(16));
+        dec.setOnMouseReleased(e -> switchRadix(10));
+        oct.setOnMouseReleased(e -> switchRadix(8));
+        bin.setOnMouseReleased(e -> switchRadix(2));
+
+        displayHex.getStyleClass().add("display-radix");
+        displayDec.getStyleClass().add("display-radix");
+        displayOct.getStyleClass().add("display-radix");
+        displayBin.getStyleClass().add("display-radix");
         displayHex.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         displayDec.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         displayOct.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -156,17 +254,17 @@ public class Calculator extends Application {
         RowConstraints mro5 = new RowConstraints();
         RowConstraints mro6 = new RowConstraints();
         RowConstraints mro7 = new RowConstraints();
-        mro1.setPercentHeight(3000.0 / 170);
-        mro2.setPercentHeight(3000.0 / 170);
-        mro3.setPercentHeight(3000.0 / 170);
-        mro4.setPercentHeight(2000.0 / 170);
-        mro5.setPercentHeight(2000.0 / 170);
-        mro6.setPercentHeight(2000.0 / 170);
-        mro7.setPercentHeight(2000.0 / 170);
+        mro1.setPercentHeight(4000.0 / 240);
+        mro2.setPercentHeight(4000.0 / 240);
+        mro3.setPercentHeight(4000.0 / 240);
+        mro4.setPercentHeight(3000.0 / 240);
+        mro5.setPercentHeight(3000.0 / 240);
+        mro6.setPercentHeight(3000.0 / 240);
+        mro7.setPercentHeight(3000.0 / 240);
         ColumnConstraints mco1 = new ColumnConstraints();
         ColumnConstraints mco2 = new ColumnConstraints();
-        mco1.setPercentWidth(15);
-        mco2.setPercentWidth(85);
+        mco1.setPercentWidth(18);
+        mco2.setPercentWidth(82);
 
         monitor.add(programmer, 0, 0, 2, 1);
         monitor.add(displayExpression, 1, 1, 2, 1);
@@ -181,7 +279,7 @@ public class Calculator extends Application {
         monitor.add(displayBin, 1, 6);
         monitor.getRowConstraints().addAll(mro1, mro2, mro3, mro4, mro5, mro6, mro7);
         monitor.getColumnConstraints().addAll(mco1, mco2);
-        monitor.setPrefSize(360, 170);
+        monitor.setPrefSize(360, 240);
         monitor.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         monitor.setAlignment(Pos.BOTTOM_RIGHT);
         monitor.getStyleClass().add("monitor");
@@ -189,6 +287,7 @@ public class Calculator extends Application {
         for(int i = 0; i < buttonContents.length; i++) {
             for(int j = 0; j < buttonContents[i].length; j++) {
                 String buttonContent = buttonContents[i][j];
+
                 if(buttonContent.equals(""))
                     continue;
                 
@@ -201,7 +300,13 @@ public class Calculator extends Application {
                         buttonContent.equals("⌫") ||
                         buttonContent.equals("Not") ||
                         buttonContent.equals("CE") ||
+                        buttonContent.equals("Ċ") ||
+                        buttonContent.equals("A") ||
+                        buttonContent.equals("B") ||
                         buttonContent.equals("C") ||
+                        buttonContent.equals("D") ||
+                        buttonContent.equals("E") ||
+                        buttonContent.equals("F") ||
                         Character.isDigit(buttonContent.charAt(0)))
                     button.armedProperty().addListener(ov -> refresh(true));
                 else 
@@ -212,30 +317,40 @@ public class Calculator extends Application {
                 buttons[i][j] = button;
 
                 button.getStyleClass().add("button");
-                if(i <= 1)
-                    button.getStyleClass().add("light-button");
-                else if((3 <= i && i <= 5 && 0 <= j && j <= 1) || buttonContent.equals("."))
-                    button.getStyleClass().add("unusable-button");
-                else if(Character.isDigit(buttonContent.charAt(0)))
-                    button.getStyleClass().add("bold-button");
 
-                if(i == 0 && j == 2) {
-                    button.getStyleClass().add("span-button");
-                    keypad.add(button, j, i, 2, 1);
+                if(i == 0)
+                    button.getStyleClass().add("light-button");
+                else if(Character.isDigit(buttonContent.charAt(0)))
+                    button.getStyleClass().add("numeral-button");
+                else if(buttonContent.equals("A") || buttonContent.equals("B") ||
+                        buttonContent.equals("C") || buttonContent.equals("D") ||
+                        buttonContent.equals("E") || buttonContent.equals("F")) {
+                    button.getStyleClass().add("numeral-button");
+                    button.setStyle("-fx-text-fill: #AAAAAA");
+                    button.setDisable(true);
                 }
+                else if(buttonContent.equals(".")) {
+                    button.setStyle("-fx-text-fill: #AAAAAA");
+                    button.setDisable(true);
+                }
+
+                if(i == 0 && j == 2) 
+                    keypad.add(button, j, i, 2, 1);
                 else
                     keypad.add(button, j, i);
+
+                if(i > 0)
+                    keypad.setMargin(button, new Insets(2));
             }
         }
 
         for(int i = 0; i < buttonContents.length; i++) {
             RowConstraints ro = new RowConstraints();
-            
-            if(i <= 1) 
-                ro.setPercentHeight(100.0 / buttonContents.length - (buttonContents.length - 2) / 2);
-            else
-                ro.setPercentHeight(100.0 / buttonContents.length + 1);
-            
+            if(i == 0)
+                ro.setPercentHeight(13);
+            else 
+                ro.setPercentHeight(14.5);
+
             keypad.getRowConstraints().add(i, ro);
         }
 
@@ -246,13 +361,13 @@ public class Calculator extends Application {
         }
 
         keypad.getStyleClass().add("keypad");
-        keypad.setPrefSize(360, 300);
+        keypad.setPrefSize(360, 345);
         keypad.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         RowConstraints pro1 = new RowConstraints();
         RowConstraints pro2 = new RowConstraints();
-        pro1.setPercentHeight(19600.0 / 596);
-        pro2.setPercentHeight(40000.0 / 596);
+        pro1.setPercentHeight(24000.0 / 585);
+        pro2.setPercentHeight(34500.0 / 585);
         ColumnConstraints pco = new ColumnConstraints();
         pco.setPercentWidth(100);
         pane.getRowConstraints().addAll(pro1, pro2);
@@ -260,7 +375,7 @@ public class Calculator extends Application {
 
         pane.add(monitor, 0, 0);
         pane.add(keypad, 0, 1);
-        pane.setPrefSize(360, 596);
+        pane.setPrefSize(360, 585);
         pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         scene = new Scene(pane);
@@ -276,6 +391,18 @@ public class Calculator extends Application {
                 case "7":
                 case "8":
                 case "9":
+                case "a":
+                case "b":
+                case "c":
+                case "d":
+                case "e":
+                case "f":
+                case "A":
+                case "B":
+                case "C":
+                case "D":
+                case "E":
+                case "F":
                     input.setOperand(e.getCharacter());
                     refresh(true);
                     break;
