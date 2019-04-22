@@ -128,19 +128,13 @@ public class Input {
         return expression.toString();
     }
 
-    public void getResult() {
+    public void getResult() throws Exception {
         lastOperator = "";
 
         if(operand.length() != 0)
             expression.append(Integer.toString(getOperand()));
 
-        int result;
-        try {
-            result = expression.getResultValue();
-        }
-        catch(Exception e) {
-            result = 0;
-        }
+        int result = expression.getResultValue();
 
         operand = new StringBuilder(Integer.toString(result, radix));
         expression.clear();

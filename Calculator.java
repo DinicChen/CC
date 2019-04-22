@@ -47,11 +47,11 @@ public class Calculator extends Application {
     };
     private Button[][] buttons = new Button[buttonContents.length][buttonContents[0].length];
 
-    private void refresh(boolean scale) {
+    private void refresh(boolean radix) {
         String expression = input.getExpression();
         displayExpression.setText(expression);
         
-        if(!scale)
+        if(!radix)
             return;
 
         int currentNumber = input.getOperand();
@@ -65,7 +65,7 @@ public class Calculator extends Application {
         displayOct.setText(oct);
         displayBin.setText(bin);
         
-        switch(radix) {
+        switch(this.radix) {
             case 2:
                 displayCurrentNumber.setText(bin);
                 break;
@@ -133,7 +133,15 @@ public class Calculator extends Application {
                 handler = (ActionEvent e) -> input.switchSign();
                 break;
             case "=":
-                handler = (ActionEvent e) -> input.getResult();
+                handler = (ActionEvent e) -> {
+                    try {
+                        input.getResult();
+                    }
+                    catch(Exception ex) {
+                        refresh(true);
+                        displayCurrentNumber.setText("EXPRESSION IS ILLEGAL!");
+                    }
+                };
                 break;
             default:
                 handler = (ActionEvent e) -> {};
@@ -304,8 +312,7 @@ public class Calculator extends Application {
                 button.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
                 button.setOnAction(getButtonHandler(buttonContent));
 
-                if(buttonContent.equals("=") ||
-                        buttonContent.equals("⌫") ||
+                if(buttonContent.equals("⌫") ||
                         buttonContent.equals("Not") ||
                         buttonContent.equals("±") ||
                         buttonContent.equals("CE") ||
@@ -318,7 +325,7 @@ public class Calculator extends Application {
                         buttonContent.equals("F") ||
                         Character.isDigit(buttonContent.charAt(0)))
                     button.armedProperty().addListener(ov -> refresh(true));
-                else 
+                else if(!buttonContent.equals("="))
                     button.armedProperty().addListener(ov -> refresh(false));
 
                 button.setOnMouseEntered(e -> {button.getStyleClass().add("enter-button");});
@@ -434,8 +441,14 @@ public class Calculator extends Application {
                     refresh(false);
                     break;
                 case "=":
-                    input.getResult();
-                    refresh(true);
+                    try {
+                        input.getResult();
+                    }
+                    catch(Exception ex) {
+                        refresh(true);
+                        displayCurrentNumber.setText("EXPRESSION IS ILLEGAL!");
+                    }
+
                     break;
             }
         });
@@ -447,8 +460,14 @@ public class Calculator extends Application {
                     refresh(true);
                     break;
                 case ENTER:
-                    input.getResult();
-                    refresh(true);
+                    try {
+                        input.getResult();
+                    }
+                    catch(Exception ex) {
+                        refresh(true);
+                        displayCurrentNumber.setText("EXPRESSION IS ILLEGAL!");
+                    }
+
                     break;
             }
         });
@@ -464,4 +483,3 @@ public class Calculator extends Application {
         launch(args);
     }
 }
-
