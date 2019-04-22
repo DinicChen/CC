@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 public class Input {
     private int radix = 10;
+    private String lastOperator = "";
     private StringBuilder operand = new StringBuilder();
     private InfixExpression expression = new InfixExpression();
 
@@ -17,7 +18,7 @@ public class Input {
 
     public void setOperand(String content) {
         operand.append(content);
-        System.out.println(operand);
+        lastOperator = "";
     }
 
     public int getOperand() {
@@ -28,7 +29,6 @@ public class Input {
             return Integer.parseInt(operand.toString(), radix);
         }
         catch(NumberFormatException e) {
-            System.out.println("===" + e);
             return 0;
         }
     }
@@ -60,6 +60,18 @@ public class Input {
     public void appendOperator(String content) {
         try {
             String operator = getOperator(content);
+            
+            if(operator.equals(")") &&
+                    !(lastOperator.equals("") ||
+                     lastOperator.equals(")") ||
+                     expression.canAppendClosingBrace()))
+                throw new IllegalArgumentException();
+            else if(!lastOperator.equals("") &&
+                    !lastOperator.equals(")") &&
+                    !operator.equals("(")) 
+                expression.pop();
+
+            lastOperator = operator;
             
             if(operand.length() != 0) {
                 expression.append(Integer.toString(getOperand()));
@@ -117,6 +129,8 @@ public class Input {
     }
 
     public void getResult() {
+        lastOperator = "";
+
         if(operand.length() != 0)
             expression.append(Integer.toString(getOperand()));
 

@@ -103,5 +103,21 @@ abstract class Expression implements Iterable<ExpressionElement> {
         expression.clear();
     }
 
+    public void pop() {
+        expression.remove(expression.size() - 1);
+    }
+
+    public boolean canAppendClosingBrace() {
+        int balance = 0;
+        for(ExpressionElement e : expression)
+            if(e instanceof ExpressionDelimeter)
+                if(e.equals(ExpressionDelimeter.DM_LEFT_PARENTHESES))
+                    balance++;
+                else if(e.equals(ExpressionDelimeter.DM_RIGHT_PARENTHESES))
+                    balance--;
+
+        return balance > 0 ? true : false;         
+    }
+
     public abstract int getResultValue() throws Exception;
 }

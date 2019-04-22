@@ -234,9 +234,17 @@ public class Calculator extends Application {
         bin.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         hex.setOnMouseReleased(e -> switchRadix(16));
+        hex.setOnMouseEntered(e -> {hex.getStyleClass().add("enter-radix");});
+        hex.setOnMouseExited(e -> {hex.getStyleClass().remove("enter-radix");});
         dec.setOnMouseReleased(e -> switchRadix(10));
+        dec.setOnMouseEntered(e -> {dec.getStyleClass().add("enter-radix");});
+        dec.setOnMouseExited(e -> {dec.getStyleClass().remove("enter-radix");});
         oct.setOnMouseReleased(e -> switchRadix(8));
+        oct.setOnMouseEntered(e -> {oct.getStyleClass().add("enter-radix");});
+        oct.setOnMouseExited(e -> {oct.getStyleClass().remove("enter-radix");});
         bin.setOnMouseReleased(e -> switchRadix(2));
+        bin.setOnMouseEntered(e -> {bin.getStyleClass().add("enter-radix");});
+        bin.setOnMouseExited(e -> {bin.getStyleClass().remove("enter-radix");});
 
         displayHex.getStyleClass().add("display-radix");
         displayDec.getStyleClass().add("display-radix");
@@ -299,6 +307,7 @@ public class Calculator extends Application {
                 if(buttonContent.equals("=") ||
                         buttonContent.equals("⌫") ||
                         buttonContent.equals("Not") ||
+                        buttonContent.equals("±") ||
                         buttonContent.equals("CE") ||
                         buttonContent.equals("Ċ") ||
                         buttonContent.equals("A") ||
@@ -329,7 +338,12 @@ public class Calculator extends Application {
                     button.setStyle("-fx-text-fill: #AAAAAA");
                     button.setDisable(true);
                 }
-                else if(buttonContent.equals(".")) {
+                else if(buttonContent.equals(".") ||
+                        buttonContent.equals("MS") ||
+                        buttonContent.equals("M") ||
+                        buttonContent.equals("⍌") ||
+                        buttonContent.equals("⍞") ||
+                        buttonContent.equals("↑")) {
                     button.setStyle("-fx-text-fill: #AAAAAA");
                     button.setDisable(true);
                 }
