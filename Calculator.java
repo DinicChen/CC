@@ -63,17 +63,17 @@ public class Calculator extends Application {
 
         if(wordSize < 64) {
             int currentOperand = (int)getOperand();
-            hex = Integer.toHexString(currentOperand).toUpperCase();
+            hex = Integer.toString(currentOperand, 16).toUpperCase();
             dec = Integer.toString(currentOperand);
-            oct = Integer.toOctalString(currentOperand);
-            bin = Integer.toBinaryString(currentOperand);
+            oct = Integer.toString(currentOperand, 8);
+            bin = Integer.toString(currentOperand, 2);
         }
         else {
             long currentOperand = getOperand();
-            hex = Long.toHexString(currentOperand).toUpperCase();
+            hex = Long.toString(currentOperand, 16).toUpperCase();
             dec = Long.toString(currentOperand);
-            oct = Long.toOctalString(currentOperand);
-            bin = Long.toBinaryString(currentOperand);
+            oct = Long.toString(currentOperand, 8);
+            bin = Long.toString(currentOperand, 2);
         }
 
         displayHex.setText(hex);
@@ -216,7 +216,6 @@ public class Calculator extends Application {
             numeral.setStyle("-fx-text-fill: #AAAAAA");
         }
 
-
         if(wordSize <= 32) {
             int currentOperand = (int)getOperand();
             operand = new StringBuilder(Integer.toString(currentOperand, radix));
@@ -276,11 +275,11 @@ public class Calculator extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        programmer.getStyleClass().add("programmer");
+        programmer.setId("programmer");
         programmer.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        displayExpression.getStyleClass().add("display-expression");
-        displayCurrentNumber.getStyleClass().add("display-current-number");
+        displayExpression.setId("displayExpression");
+        displayCurrentNumber.setId("displayCurrentNumber");
         displayExpression.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         displayCurrentNumber.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
@@ -351,7 +350,7 @@ public class Calculator extends Application {
         monitor.setPrefSize(360, 240);
         monitor.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         monitor.setAlignment(Pos.BOTTOM_RIGHT);
-        monitor.getStyleClass().add("monitor");
+        monitor.setId("monitor");
 
         for(int i = 0; i < buttonContents.length; i++) {
             for(int j = 0; j < buttonContents[i].length; j++) {
@@ -434,7 +433,7 @@ public class Calculator extends Application {
             keypad.getColumnConstraints().add(i, co);
         }
 
-        keypad.getStyleClass().add("keypad");
+        keypad.setId("keypad");
         keypad.setPrefSize(360, 345);
         keypad.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 

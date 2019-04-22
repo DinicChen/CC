@@ -1,0 +1,77 @@
+#monitor {
+    -fx-background-color: #F2F2F2;
+    -fx-padding: 10 2;
+}
+
+#programmer {
+    -fx-padding: 2 10;
+    -fx-font-size: 22px;
+    -fx-font-weight: bolder;
+}
+
+#displayExpression {
+    -fx-padding: 2 10;
+    -fx-alignment: baseline-right;
+}
+
+#displayCurrentNumber {
+    -fx-padding: 2 10;
+    -fx-font-size: 18px;
+    -fx-font-weight: bolder;
+    -fx-alignment: baseline-right;
+}
+
+.radix {
+    -fx-border-width: 0 0 0 3;
+    -fx-border-color: #F2F2F2;
+    -fx-padding: 0 10;
+    -fx-font-size: 14px;
+    -fx-font-weight: bolder;
+    -fx-cursor: hand;
+}
+
+.enter-radix {
+    -fx-background-color: #AAAAAA;
+    -fx-text-fill: white;
+    -fx-opacity: 0.2;
+}
+
+.current-radix {
+    -fx-border-color: #3882DA;
+}
+
+.display-radix {
+    -fx-padding: 2 10;
+}
+
+#keypad {
+    -fx-border-width: 1;
+    -fx-border-color: #E5E5E5;
+    -fx-background-color: #E5E5E5;
+}
+
+.button {
+    -fx-border-radius: 0;
+    -fx-border-width: 0;
+    -fx-background-color: #F4F4F4;
+    -fx-font: 12 serif;
+    -fx-text-fill: black;
+}
+
+.light-button {
+    -fx-background-color: #F2F2F2;
+}
+
+.numeral-button {
+    -fx-background-color: white;
+    -fx-opacity: 1;
+}
+
+.enter-button {
+    -fx-opacity: 0.7;
+    -fx-cursor: hand;
+}
+
+#WORD {
+    -fx-text-fill: #3882DA;
+}
