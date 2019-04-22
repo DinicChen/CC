@@ -17,7 +17,10 @@ import javafx.stage.Stage;
 
 public class Calculator extends Application {
     private int radix = 10;
-    private Input input = new Input();    
+    private int wordSize = 16;
+    private String lastOperator = "";
+    private StringBuilder operand = new StringBuilder();
+    private InfixExpression expression = new InfixExpression();
 
     private Scene scene;
     private GridPane pane = new GridPane();
@@ -48,37 +51,44 @@ public class Calculator extends Application {
     private Button[][] buttons = new Button[buttonContents.length][buttonContents[0].length];
 
     private void refresh(boolean radix) {
-        String expression = input.getExpression();
-        displayExpression.setText(expression);
+        displayExpression.setText(expression.toString());
         
         if(!radix)
             return;
 
-        int currentNumber = input.getOperand();
-        String hex = Integer.toHexString(currentNumber).toUpperCase();
-        String dec = Integer.toString(currentNumber);
-        String oct = Integer.toOctalString(currentNumber);
-        String bin = Integer.toBinaryString(currentNumber);
+        String hex;
+        String dec;
+        String oct;
+        String bin;
+
+        if(wordSize < 64) {
+            int currentOperand = (int)getOperand();
+            hex = Integer.toHexString(currentOperand).toUpperCase();
+            dec = Integer.toString(currentOperand);
+            oct = Integer.toOctalString(currentOperand);
+            bin = Integer.toBinaryString(currentOperand);
+        }
+        else {
+            long currentOperand = getOperand();
+            hex = Long.toHexString(currentOperand).toUpperCase();
+            dec = Long.toString(currentOperand);
+            oct = Long.toOctalString(currentOperand);
+            bin = Long.toBinaryString(currentOperand);
+        }
 
         displayHex.setText(hex);
         displayDec.setText(dec);
         displayOct.setText(oct);
         displayBin.setText(bin);
         
-        switch(this.radix) {
-            case 2:
-                displayCurrentNumber.setText(bin);
-                break;
-            case 8:
-                displayCurrentNumber.setText(oct);
-                break;
-            case 10:
-                displayCurrentNumber.setText(dec);
-                break;
-            case 16:
-                displayCurrentNumber.setText(hex);
-                break;
-        }
+        if(this.radix == 2)
+            displayCurrentNumber.setText(bin);
+        if(this.radix == 8)
+            displayCurrentNumber.setText(oct);
+        if(this.radix == 10)
+            displayCurrentNumber.setText(dec);
+        if(this.radix == 16)
+            displayCurrentNumber.setText(hex);
     }
 
     private EventHandler<ActionEvent> getButtonHandler(String content) {
@@ -101,7 +111,7 @@ public class Calculator extends Application {
             case "D":
             case "E":
             case "F":
-                handler = (ActionEvent e) -> {input.setOperand(content);};
+                handler = (ActionEvent e) -> {setOperand(content);};
                 break;
             case "+":
             case "-":
@@ -115,32 +125,65 @@ public class Calculator extends Application {
             case "Rsh":
             case "(":
             case ")":
-                handler = (ActionEvent e) -> input.appendOperator(content);;
+                handler = (ActionEvent e) -> appendOperator(content);;
                 break;
             case "⌫":
-                handler = (ActionEvent e) -> input.backspace();;
+                handler = (ActionEvent e) -> backspace();
                 break;
             case "Not":
-                handler = (ActionEvent e) -> input.not();;
+                handler = (ActionEvent e) -> not();
                 break;
             case "Ċ":
-                handler = (ActionEvent e) -> input.clear();;
+                handler = (ActionEvent e) -> clear();
                 break;
             case "CE":
-                handler = (ActionEvent e) -> input.clearEntry();
+                handler = (ActionEvent e) -> clearEntry();
                 break;
             case "±":
-                handler = (ActionEvent e) -> input.switchSign();
+                handler = (ActionEvent e) -> switchSign();
                 break;
             case "=":
                 handler = (ActionEvent e) -> {
                     try {
-                        input.getResult();
+                        getResult();
+                        refresh(true);
                     }
                     catch(Exception ex) {
-                        refresh(true);
+                        refresh(false);
                         displayCurrentNumber.setText("EXPRESSION IS ILLEGAL!");
                     }
+                };
+                break;
+            case "BYTE":
+                handler = (ActionEvent e) -> {
+                    Button button = (Button)e.getSource();
+                    button.setText("WORD");
+                    button.setOnAction(getButtonHandler("WORD"));
+                    wordSize = 16;
+                };
+                break;
+            case "WORD":
+                handler = (ActionEvent e) -> {
+                    Button button = (Button)e.getSource();
+                    button.setText("DWORD");
+                    button.setOnAction(getButtonHandler("DWORD"));
+                    wordSize = 32;
+                };
+                break;
+            case "DWORD":
+                handler = (ActionEvent e) -> {
+                    Button button = (Button)e.getSource();
+                    button.setText("QWORD");
+                    button.setOnAction(getButtonHandler("QWORD"));
+                    wordSize = 64;
+                };
+                break;
+            case "QWORD":
+                handler = (ActionEvent e) -> {
+                    Button button = (Button)e.getSource();
+                    button.setText("BYTE");
+                    button.setOnAction(getButtonHandler("BYTE"));
+                    wordSize = 8;
                 };
                 break;
             default:
@@ -172,8 +215,19 @@ public class Calculator extends Application {
             numeral.setDisable(true);
             numeral.setStyle("-fx-text-fill: #AAAAAA");
         }
+
+
+        if(wordSize <= 32) {
+            int currentOperand = (int)getOperand();
+            operand = new StringBuilder(Integer.toString(currentOperand, radix));
+        }
+        else if(wordSize == 64) {
+            long currentOperand = getOperand();
+            operand = new StringBuilder(Long.toString(currentOperand, radix));
+        }
         
         this.radix = radix;
+        expression.setRadix(radix);
 
         if(this.radix == 2) {
             bin.getStyleClass().add("current-radix");
@@ -217,7 +271,6 @@ public class Calculator extends Application {
             }
         }
 
-        input.setRadix(radix);
         refresh(true);
     }
 
@@ -424,7 +477,7 @@ public class Calculator extends Application {
                 case "D":
                 case "E":
                 case "F":
-                    input.setOperand(e.getCharacter());
+                    setOperand(e.getCharacter());
                     refresh(true);
                     break;
                 case "+":
@@ -437,15 +490,16 @@ public class Calculator extends Application {
                 case "&":
                 case "(":
                 case ")":
-                    input.appendOperator(e.getCharacter());
+                    appendOperator(e.getCharacter());
                     refresh(false);
                     break;
                 case "=":
                     try {
-                        input.getResult();
+                        getResult();
+                        refresh(true);
                     }
                     catch(Exception ex) {
-                        refresh(true);
+                        refresh(false);
                         displayCurrentNumber.setText("EXPRESSION IS ILLEGAL!");
                     }
 
@@ -456,15 +510,16 @@ public class Calculator extends Application {
         scene.setOnKeyPressed(e -> {
             switch(e.getCode()) {
                 case BACK_SPACE:
-                    input.backspace();
+                    backspace();
                     refresh(true);
                     break;
                 case ENTER:
                     try {
-                        input.getResult();
+                        getResult();
+                        refresh(true);
                     }
                     catch(Exception ex) {
-                        refresh(true);
+                        refresh(false);
                         displayCurrentNumber.setText("EXPRESSION IS ILLEGAL!");
                     }
 
@@ -481,5 +536,167 @@ public class Calculator extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private long getOperand() {
+        if(operand.length() == 0)
+            return 0;
+
+        try {
+            return Long.parseLong(operand.toString(), radix);
+        }
+        catch(NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private String getOperator(String content) throws IllegalArgumentException {
+        switch(content) {
+            case "+": return "+";
+            case "-": return "-";
+            case "*":
+            case "×": return "×";
+            case "/":
+            case "÷": return "÷";
+            case "%":
+            case "Mod": return "%";
+            case "|":
+            case "Or": return "|";
+            case "^":
+            case "Xor": return "^";
+            case "&":
+            case "And": return "&";
+            case "Lsh": return "<<";
+            case "Rsh": return ">>";
+            case "(": return "(";
+            case ")": return ")";
+            default: throw new IllegalArgumentException();
+        }
+    }
+
+    private void setOperand(String content) {
+        operand.append(content);
+
+        if(wordSize == 8) {
+            try {
+                Byte.parseByte(operand.toString(), radix);
+            }
+            catch(NumberFormatException e) {
+                backspace();
+            }
+        }
+        else if(wordSize == 16) {
+            try {
+                Short.parseShort(operand.toString(), radix);
+            }
+            catch(NumberFormatException e) {
+                backspace();
+            }
+        }
+        else if(wordSize == 32) {
+            try {
+                Integer.parseInt(operand.toString(), radix);
+            }
+            catch(NumberFormatException e) {
+                backspace();
+            }
+        }
+        else if(wordSize == 64) {
+            try {
+                Long.parseLong(operand.toString(), radix);
+            }
+            catch(NumberFormatException e) {
+                backspace();
+            }
+        }
+
+        lastOperator = "";
+    }
+    
+    private void appendOperator(String content) {
+        try {
+            String operator = getOperator(content);
+            
+            if(operator.equals(")") &&
+                    !(lastOperator.equals("") ||
+                     lastOperator.equals(")") ||
+                     expression.canAppendClosingBrace()))
+                throw new IllegalArgumentException();
+            else if(!lastOperator.equals("") &&
+                    !lastOperator.equals(")") &&
+                    !operator.equals("(")) 
+                expression.pop();
+
+            lastOperator = operator;
+            
+            if(operand.length() != 0) {
+                expression.append(Long.toString(getOperand()));
+                operand = new StringBuilder();
+            }
+
+            expression.append(operator);
+        }
+        catch(IllegalArgumentException e) {
+        }
+    }
+
+    private void backspace() {
+        if(operand.length() != 0)
+            operand.deleteCharAt(operand.length() - 1);
+    }
+
+    private void not() {
+        if(operand.length() == 0) 
+            return;
+        
+        if(wordSize < 64) {
+            int currentOperand = (int)getOperand();
+            currentOperand = ~currentOperand;
+            operand = new StringBuilder(Integer.toString(currentOperand, radix));
+        }
+        else {
+            long currentOperand = getOperand();
+            currentOperand = ~currentOperand;
+            operand = new StringBuilder(Long.toString(currentOperand, radix));
+        }
+    }
+
+    private void clear() {
+        expression.clear();
+        operand = new StringBuilder();
+    }
+
+    private void clearEntry() {
+        operand = new StringBuilder();
+    }
+
+    private void switchSign() {
+        if(operand.length() == 0) 
+            return;
+
+        if(operand.charAt(0) != '-') 
+            operand.insert(0, '-');
+        else
+            operand.deleteCharAt(0);
+    }
+
+    private void getResult() throws Exception {
+        lastOperator = "";
+
+        if(operand.length() != 0)
+            expression.append(Long.toString(getOperand()));
+
+        long result = expression.getResultValue();
+
+        if(wordSize == 8)
+            operand = new StringBuilder(Integer.toString((byte)result, radix));
+        else if(wordSize == 16)
+            operand = new StringBuilder(Integer.toString((short)result, radix));
+        else if(wordSize == 32)
+            operand = new StringBuilder(Integer.toString((int)result, radix));
+        else
+            operand = new StringBuilder(Long.toString(result, radix));
+
+        expression.clear();
     }
 }

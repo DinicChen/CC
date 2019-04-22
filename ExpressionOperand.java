@@ -1,11 +1,11 @@
 class ExpressionOperand extends ExpressionElement implements Comparable<ExpressionOperand> {
-    private final int value;
+    private final long value;
 
     public ExpressionOperand(String content) {
         super(content);
 
         try {
-            value = Integer.parseInt(content);
+            value = long.parseInt(content);
         }
         catch(NumberFormatException e) {
             throw new IllegalArgumentException(content + " is a illegal");
@@ -13,11 +13,11 @@ class ExpressionOperand extends ExpressionElement implements Comparable<Expressi
     }
 
     public ExpressionOperand(int value) {
-        super(Integer.toString(value));
+        super(Long.toString(value));
         this.value = value;
     }
 
-    public int getValue() {
+    public long getValue() {
         return value;
     }
 
