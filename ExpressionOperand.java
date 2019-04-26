@@ -5,7 +5,7 @@ class ExpressionOperand extends ExpressionElement implements Comparable<Expressi
         super(content);
 
         try {
-            value = long.parseInt(content);
+            value = Long.parseLong(content);
         }
         catch(NumberFormatException e) {
             throw new IllegalArgumentException(content + " is a illegal");
@@ -23,7 +23,7 @@ class ExpressionOperand extends ExpressionElement implements Comparable<Expressi
 
     @Override
     public int compareTo(ExpressionOperand other) {
-        return Integer.compare(this.value, other.value);
+        return Long.compare(this.value, other.value);
     }
 
     @Override

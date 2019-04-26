@@ -3,14 +3,14 @@ import java.util.Iterator;
 import java.util.List;
 
 abstract class Expression implements Iterable<ExpressionElement> {
-    private int radix = 10;
+    private Radix radix = Radix.DECIMAL;
     protected final List<ExpressionElement> expression = new ArrayList<>();
 
     public int getRadix() {
-        return radix;
+        return radix.getRadix();
     }
 
-    public void setRadix(int radix) {
+    public void setRadix(Radix radix) {
         this.radix = radix;
     }
 
@@ -85,8 +85,8 @@ abstract class Expression implements Iterable<ExpressionElement> {
             else
                 firstAdd = false;
 
-            if(radix != 10 && e instanceof ExpressionOperand)
-                sb.append(Integer.toString(((ExpressionOperand)e).getValue(), radix).toUpperCase());
+            if(radix != Radix.DECIMAL && e instanceof ExpressionOperand)
+                sb.append(Long.toString(((ExpressionOperand)e).getValue(), radix.getRadix()).toUpperCase());
             else
                 sb.append(e.toString());
         }

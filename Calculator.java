@@ -16,8 +16,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Calculator extends Application {
-    private int radix = 10;
-    private int wordSize = 16;
+    private Radix radix = Radix.DECIMAL;
+    private WordSize wordSize = WordSize.WORD;
     private String lastOperator = "";
     private StringBuilder operand = new StringBuilder();
     private InfixExpression expression = new InfixExpression();
@@ -61,7 +61,7 @@ public class Calculator extends Application {
         String oct;
         String bin;
 
-        if(wordSize < 64) {
+        if(wordSize.compareTo(WordSize.QWORD) < 0) {
             int currentOperand = (int)getOperand();
             hex = Integer.toString(currentOperand, 16).toUpperCase();
             dec = Integer.toString(currentOperand);
@@ -81,13 +81,13 @@ public class Calculator extends Application {
         displayOct.setText(oct);
         displayBin.setText(bin);
         
-        if(this.radix == 2)
+        if(this.radix == Radix.BINARY)
             displayCurrentNumber.setText(bin);
-        if(this.radix == 8)
+        if(this.radix == Radix.OCTAL)
             displayCurrentNumber.setText(oct);
-        if(this.radix == 10)
+        if(this.radix == Radix.DECIMAL)
             displayCurrentNumber.setText(dec);
-        if(this.radix == 16)
+        if(this.radix == Radix.HEXADECIMAL)
             displayCurrentNumber.setText(hex);
     }
 
@@ -159,7 +159,7 @@ public class Calculator extends Application {
                     Button button = (Button)e.getSource();
                     button.setText("WORD");
                     button.setOnAction(getButtonHandler("WORD"));
-                    wordSize = 16;
+                    wordSize = WordSize.WORD;
                 };
                 break;
             case "WORD":
@@ -167,7 +167,7 @@ public class Calculator extends Application {
                     Button button = (Button)e.getSource();
                     button.setText("DWORD");
                     button.setOnAction(getButtonHandler("DWORD"));
-                    wordSize = 32;
+                    wordSize = WordSize.DWORD;
                 };
                 break;
             case "DWORD":
@@ -175,7 +175,7 @@ public class Calculator extends Application {
                     Button button = (Button)e.getSource();
                     button.setText("QWORD");
                     button.setOnAction(getButtonHandler("QWORD"));
-                    wordSize = 64;
+                    wordSize = WordSize.QWORD;
                 };
                 break;
             case "QWORD":
@@ -183,7 +183,7 @@ public class Calculator extends Application {
                     Button button = (Button)e.getSource();
                     button.setText("BYTE");
                     button.setOnAction(getButtonHandler("BYTE"));
-                    wordSize = 8;
+                    wordSize = WordSize.BYTE;
                 };
                 break;
             default:
@@ -194,14 +194,14 @@ public class Calculator extends Application {
         return handler;
     }
 
-    private void switchRadix(int radix) {
-        if(this.radix == 2)
+    private void switchRadix(Radix radix) {
+        if(this.radix == Radix.BINARY)
             bin.getStyleClass().remove("current-radix");
-        else if(this.radix == 8)
+        else if(this.radix == Radix.OCTAL)
             oct.getStyleClass().remove("current-radix");
-        else if(this.radix == 10)
+        else if(this.radix == Radix.DECIMAL)
             dec.getStyleClass().remove("current-radix");
-        else if(this.radix == 16)
+        else if(this.radix == Radix.HEXADECIMAL)
             hex.getStyleClass().remove("current-radix");
 
         for(int i = 0; i <= 9 ; i++) {
@@ -216,19 +216,19 @@ public class Calculator extends Application {
             numeral.setStyle("-fx-text-fill: #AAAAAA");
         }
 
-        if(wordSize <= 32) {
+        if(wordSize.compareTo(WordSize.DWORD) <= 0) {
             int currentOperand = (int)getOperand();
-            operand = new StringBuilder(Integer.toString(currentOperand, radix));
+            operand = new StringBuilder(Integer.toString(currentOperand, radix.getRadix()));
         }
-        else if(wordSize == 64) {
+        else if(wordSize == WordSize.QWORD) {
             long currentOperand = getOperand();
-            operand = new StringBuilder(Long.toString(currentOperand, radix));
+            operand = new StringBuilder(Long.toString(currentOperand, radix.getRadix()));
         }
         
         this.radix = radix;
         expression.setRadix(radix);
 
-        if(this.radix == 2) {
+        if(this.radix == Radix.BINARY) {
             bin.getStyleClass().add("current-radix");
             Button numeral = (Button)(keypad.lookup("#0"));
             numeral.setDisable(false);
@@ -237,7 +237,7 @@ public class Calculator extends Application {
             numeral.setDisable(false);
             numeral.setStyle("-fx-text-fill: black");
         }
-        else if(this.radix == 8) {
+        else if(this.radix == Radix.OCTAL) {
             oct.getStyleClass().add("current-radix");
             for(int i = 0; i <= 7; i++) {
                 Button numeral = (Button)(keypad.lookup("#" + i));
@@ -245,7 +245,7 @@ public class Calculator extends Application {
                 numeral.setStyle("-fx-text-fill: black");
             }
         }
-        else if(this.radix == 10) {
+        else if(this.radix == Radix.DECIMAL) {
             dec.getStyleClass().add("current-radix");
 
             for(int i = 0; i <= 9 ; i++) {
@@ -254,7 +254,7 @@ public class Calculator extends Application {
                 numeral.setStyle("-fx-text-fill: black");
             }
         }
-        else if(this.radix == 16) {
+        else if(this.radix == Radix.HEXADECIMAL) {
             hex.getStyleClass().add("current-radix");
 
             for(int i = 0; i <= 9 ; i++) {
@@ -293,16 +293,16 @@ public class Calculator extends Application {
         oct.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         bin.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        hex.setOnMouseReleased(e -> switchRadix(16));
+        hex.setOnMouseReleased(e -> switchRadix(Radix.HEXADECIMAL));
         hex.setOnMouseEntered(e -> {hex.getStyleClass().add("enter-radix");});
         hex.setOnMouseExited(e -> {hex.getStyleClass().remove("enter-radix");});
-        dec.setOnMouseReleased(e -> switchRadix(10));
+        dec.setOnMouseReleased(e -> switchRadix(Radix.DECIMAL));
         dec.setOnMouseEntered(e -> {dec.getStyleClass().add("enter-radix");});
         dec.setOnMouseExited(e -> {dec.getStyleClass().remove("enter-radix");});
-        oct.setOnMouseReleased(e -> switchRadix(8));
+        oct.setOnMouseReleased(e -> switchRadix(Radix.OCTAL));
         oct.setOnMouseEntered(e -> {oct.getStyleClass().add("enter-radix");});
         oct.setOnMouseExited(e -> {oct.getStyleClass().remove("enter-radix");});
-        bin.setOnMouseReleased(e -> switchRadix(2));
+        bin.setOnMouseReleased(e -> switchRadix(Radix.BINARY));
         bin.setOnMouseEntered(e -> {bin.getStyleClass().add("enter-radix");});
         bin.setOnMouseExited(e -> {bin.getStyleClass().remove("enter-radix");});
 
@@ -542,7 +542,7 @@ public class Calculator extends Application {
             return 0;
 
         try {
-            return Long.parseLong(operand.toString(), radix);
+            return Long.parseLong(operand.toString(), radix.getRadix());
         }
         catch(NumberFormatException e) {
             return 0;
@@ -576,33 +576,33 @@ public class Calculator extends Application {
     private void setOperand(String content) {
         operand.append(content);
 
-        if(wordSize == 8) {
+        if(wordSize == WordSize.BYTE) {
             try {
-                Byte.parseByte(operand.toString(), radix);
+                Byte.parseByte(operand.toString(), radix.getRadix());
             }
             catch(NumberFormatException e) {
                 backspace();
             }
         }
-        else if(wordSize == 16) {
+        else if(wordSize == WordSize.WORD) {
             try {
-                Short.parseShort(operand.toString(), radix);
+                Short.parseShort(operand.toString(), radix.getRadix());
             }
             catch(NumberFormatException e) {
                 backspace();
             }
         }
-        else if(wordSize == 32) {
+        else if(wordSize == WordSize.DWORD) {
             try {
-                Integer.parseInt(operand.toString(), radix);
+                Integer.parseInt(operand.toString(), radix.getRadix());
             }
             catch(NumberFormatException e) {
                 backspace();
             }
         }
-        else if(wordSize == 64) {
+        else if(wordSize == WordSize.QWORD) {
             try {
-                Long.parseLong(operand.toString(), radix);
+                Long.parseLong(operand.toString(), radix.getRadix());
             }
             catch(NumberFormatException e) {
                 backspace();
@@ -648,15 +648,15 @@ public class Calculator extends Application {
         if(operand.length() == 0) 
             return;
         
-        if(wordSize < 64) {
+        if(wordSize.compareTo(WordSize.QWORD) < 0) {
             int currentOperand = (int)getOperand();
             currentOperand = ~currentOperand;
-            operand = new StringBuilder(Integer.toString(currentOperand, radix));
+            operand = new StringBuilder(Integer.toString(currentOperand, radix.getRadix()));
         }
         else {
             long currentOperand = getOperand();
             currentOperand = ~currentOperand;
-            operand = new StringBuilder(Long.toString(currentOperand, radix));
+            operand = new StringBuilder(Long.toString(currentOperand, radix.getRadix()));
         }
     }
 
@@ -687,14 +687,14 @@ public class Calculator extends Application {
 
         long result = expression.getResultValue();
 
-        if(wordSize == 8)
-            operand = new StringBuilder(Integer.toString((byte)result, radix));
-        else if(wordSize == 16)
-            operand = new StringBuilder(Integer.toString((short)result, radix));
-        else if(wordSize == 32)
-            operand = new StringBuilder(Integer.toString((int)result, radix));
+        if(wordSize == WordSize.BYTE)
+            operand = new StringBuilder(Integer.toString((byte)result, radix.getRadix()));
+        else if(wordSize == WordSize.WORD)
+            operand = new StringBuilder(Integer.toString((short)result, radix.getRadix()));
+        else if(wordSize == WordSize.DWORD)
+            operand = new StringBuilder(Integer.toString((int)result, radix.getRadix()));
         else
-            operand = new StringBuilder(Long.toString(result, radix));
+            operand = new StringBuilder(Long.toString(result, radix.getRadix()));
 
         expression.clear();
     }
