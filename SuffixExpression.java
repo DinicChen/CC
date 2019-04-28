@@ -1,5 +1,5 @@
 class SuffixExpression extends Expression {
-    private int calculate(ExpressionOperand a, ExpressionOperand b, ExpressionOperator c) {
+    private long calculate(ExpressionOperand a, ExpressionOperand b, ExpressionOperator c) {
         switch(c.getContent()) {
             case "+": return a.getValue() + b.getValue();
             case "-": return a.getValue() - b.getValue();
@@ -16,7 +16,7 @@ class SuffixExpression extends Expression {
     }
 
     @Override
-    public int getResultValue() throws Exception {
+    public long getResultValue() throws Exception {
         SimpleStack<ExpressionOperand> scalc = new SimpleStack<>();
 
         for(ExpressionElement e : expression) {

@@ -12,7 +12,7 @@ class ExpressionOperand extends ExpressionElement implements Comparable<Expressi
         }
     }
 
-    public ExpressionOperand(int value) {
+    public ExpressionOperand(long value) {
         super(Long.toString(value));
         this.value = value;
     }

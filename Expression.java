@@ -119,5 +119,5 @@ abstract class Expression implements Iterable<ExpressionElement> {
         return balance > 0 ? true : false;         
     }
 
-    public abstract int getResultValue() throws Exception;
+    public abstract long getResultValue() throws Exception;
 }

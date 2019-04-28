@@ -34,7 +34,7 @@ class InfixExpression extends Expression {
     }
 
     @Override
-    public int getResultValue() throws Exception {
+    public long getResultValue() throws Exception {
         return toSuffixExpression().getResultValue() ;
     }
 }
